@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Results</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #1b5e20;
+            margin-bottom: 20px;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #e8f5e9;
+            padding: 6px 12px;
+            margin: 5px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .grid {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 260px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .category {
+            font-size: 11px;
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>Recommended Remedies</h1>
+
+    <div id="info"></div>
+    <br>
+
+    <div class="grid" id="grid"></div>
+
+    <script>
+
+        const data = JSON.parse(localStorage.getItem("userData")) || {};
+
+        document.getElementById("info").innerHTML = `
+  <span class="tag">${data.issue || ""}</span>
+`;
+
+        let remedies = [
+            {
+                category: "RESPIRATORY",
+                title: "Cold & Cough Relief",
+                desc: "Helps clear congestion and supports immunity",
+                ingredients: ["Ginger", "Tulsi", "Honey"],
+                score: 2
+            },
+            {
+                category: "DIGESTIVE",
+                title: "Indigestion Support",
+                desc: "Improves digestion and reduces bloating",
+                ingredients: ["Cumin", "Ginger", "Lemon"],
+                score: 2
+            },
+            {
+                category: "GENERAL",
+                title: "Immunity Boost",
+                desc: "Supports overall health and resistance",
+                ingredients: ["Turmeric", "Honey", "Tulsi"],
+                score: 2
+            }
+        ];
+
+        if (data.issue && data.issue.toLowerCase().includes("cold")) {
+            remedies[0].score += 2;
+        }
+
+        if (data.issue && data.issue.toLowerCase().includes("digestion")) {
+            remedies[1].score += 2;
+        }
+
+        if (data.allergy && data.allergy.toLowerCase().includes("honey")) {
+            remedies.forEach(r => {
+                r.ingredients = r.ingredients.filter(i => i !== "Honey");
+            });
+        }
+
+        remedies.sort((a, b) => b.score - a.score);
+        const grid = document.getElementById("grid");
+
+        remedies.forEach(r => {
+
+            let tags = "";
+            r.ingredients.forEach(i => {
+                tags += `<span class="tag">${i}</span>`;
+            });
+
+            const div = document.createElement("div");
+            div.className = "card";
+
+            div.innerHTML = `
+    <div class="category">${r.category}</div>
+    <h3>${r.title}</h3>
+    <p>${r.desc}</p>
+    ${tags}
+    <p class="note">Based on your input and common remedy patterns</p>
+  `;
+
+            grid.appendChild(div);
+        });
+
+    </script>
+</body>
+
+</html>
