@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Results - {{ app_name }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero card">
+      <p class="eyebrow">Ranked output</p>
+      <h1>Recommendations for {{ profile.concern or 'your concern' }}</h1>
+      <p class="muted">Health class: {{ health_concern_group|replace('_', ' ')|title }}</p>
+      <a class="link" href="/">Back to form</a>
+    </section>
+
+    <section class="card">
+      <h2>Top recommendations</h2>
+      {% if recommendations %}
+        <div class="stack">
+          {% for item in recommendations %}
+            <article class="result-card">
+              <div class="result-head">
+                <h3>{{ item.disease }}</h3>
+                <span class="badge">Score {{ '%.2f'|format(item.score) }}</span>
+              </div>
+              <p class="muted">{{ item.symptoms }}</p>
+              <p><strong>Season:</strong> {{ item.season }} | <strong>Age:</strong> {{ item.age_group }} | <strong>Gender:</strong> {{ item.gender }}</p>
+              <p><strong>Herbs:</strong> {{ item.herbs|join(', ') if item.herbs else '—' }}</p>
+              <p><strong>Formulation:</strong> {{ item.ingredients|join(', ') if item.ingredients else '—' }}</p>
+              <p><strong>Diet & lifestyle:</strong> {{ item.diet_lifestyle or '—' }}</p>
+              <p><strong>Yoga / therapy:</strong> {{ item.yoga or '—' }}</p>
+              <div class="explain">
+                <p><strong>Why this matched:</strong> {{ item.explanation.summary }}</p>
+                {% if item.explanation.highlights %}
+                  <p><strong>Highlights:</strong> {{ item.explanation.highlights|join(', ') }}</p>
+                {% endif %}
+                <p><strong>Component scores:</strong> semantic {{ '%.2f'|format(item.explanation.component_scores.semantic_similarity) }}, concern {{ '%.2f'|format(item.explanation.component_scores.concern_match) }}, season {{ '%.2f'|format(item.explanation.component_scores.season_match) }}, digestion {{ '%.2f'|format(item.explanation.component_scores.digestion_match) }}, lifestyle {{ '%.2f'|format(item.explanation.component_scores.lifestyle_match) }}, availability {{ '%.2f'|format(item.explanation.component_scores.availability_match) }}</p>
+                {% if item.safety_notes %}
+                  <div class="warn">
+                    <strong>Safety notes:</strong>
+                    <ul>
+                      {% for note in item.safety_notes %}
+                        <li>{{ note }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                {% endif %}
+              </div>
+            </article>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p>No safe match was found with the current constraints.</p>
+      {% endif %}
+    </section>
+
+    <section class="grid-2">
+      <div class="card">
+        <h2>Common ingredients in matches</h2>
+        <ul class="stat-list">
+          {% for row in top_ingredients %}
+            <li><span>{{ row.ingredient }}</span><span>{{ row.count }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+      <div class="card">
+        <h2>Frequent ingredient pairs</h2>
+        <ul class="stat-list">
+          {% for row in top_pairs %}
+            <li><span>{{ row.ingredient_a }} + {{ row.ingredient_b }}</span><span>{{ row.count }}</span></li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
