@@ -13,6 +13,11 @@ kb = get_knowledge_base()
 
 
 @app.route('/', methods=['GET'])
+def home():
+    return render_template('home.html', app_name=APP_NAME)
+
+
+@app.route('/form', methods=['GET'])
 def index():
     return render_template('index.html', app_name=APP_NAME)
 

@@ -1,35 +1,72 @@
 <!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>AyurBase</title>
+  <title>AyurSense</title>
+
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
   <main class="shell">
-    <section class="hero card">
-      <h1>AyurBase</h1>
-      <p class="muted">Structured, safety-aware herbal remedy ranking with seasonal, digestion and lifestyle context.</p>
+
+    <section class="hero-card">
+      <h1>AyurSense</h1>
+      <p class="muted">Smart herbal recommendations based on your health, lifestyle, and season.</p>
     </section>
 
     <section class="card">
-      <form action="/recommend" method="post" class="form-grid">
-        <label>Health concern<input name="concern" placeholder="e.g. cough, acidity, stress"></label>
-        <label>Symptoms<textarea name="symptoms" rows="3" placeholder="Describe the symptoms"></textarea></label>
+      <form id="remedyForm" action="/recommend" method="post" class="form-grid">
+
+        <h2>Health Details</h2>
+
+        <label>
+          Health concern
+          <input name="concern" required placeholder="e.g. cough, acidity, stress">
+        </label>
+
+        <label>
+          Symptoms
+          <textarea name="symptoms" rows="3" placeholder="Describe symptoms..."></textarea>
+        </label>
+
         <div class="row-3">
-          <label>Season<select name="season">
-            <option value="">Select</option><option>summer</option><option>monsoon</option><option>winter</option>
-          </select></label>
-          <label>Digestion strength<select name="digestion_strength">
-            <option value="">Select</option><option>weak</option><option>moderate</option><option>strong</option>
-          </select></label>
-          <label>Meal consistency<select name="meal_consistency">
-            <option value="">Select</option><option>regular</option><option>irregular</option>
-          </select></label>
+          <label>Season
+            <select name="season" required>
+              <option value="">Select</option>
+              <option>summer</option>
+              <option>monsoon</option>
+              <option>winter</option>
+            </select>
+          </label>
+
+          <label>Digestion
+            <select name="digestion_strength" required>
+              <option value="">Select</option>
+              <option>weak</option>
+              <option>moderate</option>
+              <option>strong</option>
+            </select>
+          </label>
+
+          <label>Meals
+            <select name="meal_consistency">
+              <option value="">Select</option>
+              <option>regular</option>
+              <option>irregular</option>
+            </select>
+          </label>
         </div>
+
+        <h2>Personal Info</h2>
+
         <div class="row-3">
-          <label>Age<input name="age" type="number" min="0" max="120"></label>
+          <label>Age
+            <input name="age" type="number" min="0" max="120">
+          </label>
+
           <label>Gender
             <select name="gender">
               <option value="">Select</option>
@@ -37,13 +74,30 @@
               <option>female</option>
             </select>
           </label>
-          <label>Available ingredients<input name="available_ingredients" placeholder="ginger, honey, tulsi"></label>
+
+          <label>Ingredients
+            <input name="available_ingredients" placeholder="ginger, honey">
+          </label>
         </div>
-        <label>Allergies<input name="allergies" placeholder="milk, nuts, pollen"></label>
-        <label>Medical history<input name="medical_history" placeholder="diabetes, asthma"></label>
-        <label>Current medications<input name="current_medications" placeholder="metformin, inhaler"></label>
+
+        <h2>Safety</h2>
+
+        <label>Allergies
+          <input name="allergies" placeholder="milk, nuts">
+        </label>
+
+        <label>Medical history
+          <input name="medical_history" placeholder="diabetes, asthma">
+        </label>
+
+        <label>Current meds
+          <input name="current_medications" placeholder="metformin">
+        </label>
+
+        <h2>Lifestyle</h2>
+
         <div class="row-3">
-          <label>Stress level
+          <label>Stress
             <select name="stress_level">
               <option value="">Select</option>
               <option>low</option>
@@ -51,14 +105,16 @@
               <option>high</option>
             </select>
           </label>
-          <label>Sleep pattern
+
+          <label>Sleep
             <select name="sleep_pattern">
               <option value="">Select</option>
               <option>regular</option>
               <option>irregular</option>
             </select>
           </label>
-          <label>Physical activity
+
+          <label>Activity
             <select name="physical_activity">
               <option value="">Select</option>
               <option>low</option>
@@ -67,11 +123,15 @@
             </select>
           </label>
         </div>
-        <label>Dietary habits<input name="dietary_habits" placeholder="spicy, oily, high sugar, balanced"></label>
-        <label>Family history<input name="family_history" placeholder="diabetes, asthma, hypertension"></label>
-        <button type="submit">Generate recommendations</button>
+
+        <button type="submit">Generate Recommendations </button>
+
       </form>
     </section>
+
   </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
+
 </html>
