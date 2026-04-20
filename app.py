@@ -205,34 +205,46 @@ def predict():
     gender = user.get('gender', 'All')
     gender_age = get_age_gender_relevance(age, gender)
     
-    # Handle unseen labels by falling back to 'Unknown'
-    def safe_transform(le, val):
-        if val in le.classes_:
-            return le.transform([val])[0]
-        return le.transform(['Unknown'])[0]
-        
-    x_dis = safe_transform(remedy_encoders['disease'], predicted_disease)
-    x_dos = safe_transform(remedy_encoders['dosha'], dosha)
-    x_ga = safe_transform(remedy_encoders['gender_age'], gender_age)
+    # 3. Robust Remedy Matching (Token Intersection + Dosha Fallback)
+    import re
+    disease_tokens = set(re.findall(r'\b\w+\b', predicted_disease.lower()))
     
-    remedy_id = remedy_model.predict([[x_dis, x_dos, x_ga]])[0]
+    best_score = 0
+    best_matches = []
     
-    # Fetch details from remedy.csv
-    remedy_row = remedy_df[remedy_df['ID'] == remedy_id]
-    if len(remedy_row) == 0:
-        # Fallback if ID not found somehow
-        remedy_row = remedy_df.iloc[0]
+    for _, row in remedy_df.iterrows():
+        prob_tokens = set(re.findall(r'\b\w+\b', str(row['Problem']).lower()))
+        score = len(disease_tokens.intersection(prob_tokens))
+        if score > best_score:
+            best_score = score
+            best_matches = [row]
+        elif score == best_score and score > 0:
+            best_matches.append(row)
+            
+    if best_score > 0:
+        # We found some disease overlap! Check if any match the user's dosha
+        matched_df = pd.DataFrame(best_matches)
+        dosha_matches = matched_df[matched_df['Dosha Type'].str.contains(dosha, case=False, na=False)]
+        if len(dosha_matches) > 0:
+            remedy_row = dosha_matches.iloc[0]
+            reasoning = f"This remedy was selected specifically to balance your {dosha} constitution for {predicted_disease}."
+        else:
+            remedy_row = matched_df.iloc[0]
+            reasoning = f"This is the standard Ayurvedic recommendation for {predicted_disease}."
     else:
-        remedy_row = remedy_row.iloc[0]
-        
-    # Extract feature importances as basic "reasoning"
-    importances = remedy_model.feature_importances_
-    features = ["Disease", "Dosha Type", "Age/Gender Relevance"]
-    dominant_feature = features[np.argmax(importances)]
-    
-    reasoning = f"Based on our analysis, this remedy was primarily chosen considering your {dominant_feature}."
-    if dominant_feature == "Dosha Type":
-        reasoning += f" It balances your {dosha} constitution."
+        # Zero disease match fallback: Recommend based purely on Dosha!
+        if dosha and dosha.lower() != 'unknown':
+            dosha_matches = remedy_df[remedy_df['Dosha Type'].str.contains(dosha, case=False, na=False)]
+            if len(dosha_matches) > 0:
+                remedy_row = dosha_matches.sample(1).iloc[0] if len(dosha_matches) > 1 else dosha_matches.iloc[0]
+                reasoning = f"We couldn't find a specific match for {predicted_disease}, but this excellent remedy is highly recommended for balancing your {dosha} dosha."
+            else:
+                remedy_row = remedy_df[remedy_df['Dosha Type'].str.contains('Tridoshic', case=False, na=False)].iloc[0]
+                reasoning = "Showing a gentle, Tridoshic (all-balancing) remedy for general wellness."
+        else:
+            tridoshic_df = remedy_df[remedy_df['Dosha Type'].str.contains('Tridoshic', case=False, na=False)]
+            remedy_row = tridoshic_df.sample(1).iloc[0] if len(tridoshic_df) > 1 else tridoshic_df.iloc[0]
+            reasoning = "Showing a gentle, Tridoshic (all-balancing) remedy for general wellness."
         
     return jsonify({
         "is_severe": False,
