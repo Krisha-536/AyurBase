@@ -1,67 +1,208 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>AyurSense | AI Ayurvedic Remedy Platform</title>
 
-{% block content %}
-<div class="hero-section">
-    <div class="hero-content">
-        <h1 class="hero-title">Ancient Wisdom,<br>Modern Technology.</h1>
-        <p class="hero-subtitle">Discover personalized Ayurvedic remedies powered by advanced Deep Learning. Experience healing tailored to your unique dosha and symptoms.</p>
-        <div class="hero-actions">
-            <a href="/checker" class="btn-primary">Start Symptom Check <i class="fa-solid fa-arrow-right"></i></a>
+    <!-- Google Fonts: Elegant Serif + Modern Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- App Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+
+    <!-- ── Animated Background ─────────────────────────────── -->
+    <div class="blob-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+    <div class="particles" id="particles"></div>
+
+    <!-- ── Fixed Glassmorphism Navbar ─────────────────────── -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">✦ AyurSense</div>
+
+        <div class="hamburger" id="hamburger">
+            <i class="fas fa-bars"></i>
+        </div>
+
+        <div class="nav-links" id="navLinks">
+            <a href="#home"       class="nav-link" data-section="home">Home</a>
+            <a href="#features"   class="nav-link" data-section="features">Features</a>
+            <a href="#howitworks" class="nav-link" data-section="howitworks">How It Works</a>
+            <a href="#herbarium"  class="nav-link" data-section="herbarium">Herbarium</a>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i>
+            </button>
+            <button class="btn-ghost"    id="openLoginBtn">Login</button>
+            <button class="btn-gradient" id="openSignupBtn">Sign Up</button>
+        </div>
+    </nav>
+
+    <!-- ── Hero Section ───────────────────────────────────── -->
+    <div class="hero" id="home">
+        <div class="hero-left">
+            <h1 class="animated-headline">
+                <span class="word">AI-Powered</span>
+                <span class="word">Ayurvedic</span><br>
+                <span class="word">Wisdom,</span>
+                <span class="word">Personalised</span>
+            </h1>
+
+            <p class="hero-sub">
+                Discover your unique dosha &amp; get ancient remedies blended with neural
+                intelligence. Backed by ML models trained on 5000+ years of Ayurveda.
+            </p>
+
+            <div class="steps-mini">
+                <div class="step-mini"><span class="step-num">1</span> Dosha Quiz</div>
+                <div class="step-mini"><span class="step-num">2</span> AI Analysis</div>
+                <div class="step-mini"><span class="step-num">3</span> Herbal Remedy</div>
+            </div>
+
+            <button class="glow-cta" id="ctaMain">Begin Healing Journey →</button>
+        </div>
+
+        <!-- Herb grid is rendered by JS into this container -->
+        <div class="hero-right" id="herbarium">
+            <div class="herb-grid" id="herbGrid"></div>
         </div>
     </div>
-    <div class="hero-visual">
-        <div class="glass-card visual-card" id="visualCard1">
-            <i class="fa-solid fa-leaf icon-large"></i>
-            <h3>Natural Remedies</h3>
-        </div>
-        <div class="glass-card visual-card" id="visualCard2">
-            <i class="fa-solid fa-brain icon-large"></i>
-            <h3>AI Powered</h3>
-        </div>
-    </div>
-</div>
 
-<section class="features">
-    <div class="feature-item">
-        <div class="feature-icon"><i class="fa-solid fa-stethoscope"></i></div>
-        <h3>Accurate Diagnosis</h3>
-        <p>Our deep learning model analyzes over 300 symptoms to accurately predict your condition.</p>
+    <!-- ── Features Section ───────────────────────────────── -->
+    <div class="section" id="features">
+        <h2 class="section-title">Intelligent Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <i class="fas fa-balance-scale feature-icon"></i>
+                <h3>Dosha Profiler</h3>
+                <p>Vata, Pitta, Kapha identification via deep profiling.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-brain feature-icon"></i>
+                <h3>Neural Herb Blender</h3>
+                <p>ML synergy for potent formulations.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-chart-line feature-icon"></i>
+                <h3>Longevity Tracker</h3>
+                <p>Predictive health analytics.</p>
+            </div>
+            <div class="feature-card">
+                <i class="fas fa-spa feature-icon"></i>
+                <h3>Zero-G Rituals</h3>
+                <p>Personalised daily regimens.</p>
+            </div>
+        </div>
     </div>
-    <div class="feature-item">
-        <div class="feature-icon"><i class="fa-solid fa-mortar-pestle"></i></div>
-        <h3>Personalized Remedies</h3>
-        <p>Get remedies tailored to your age, gender, and Ayurvedic Dosha constitution.</p>
-    </div>
-    <div class="feature-item">
-        <div class="feature-icon"><i class="fa-solid fa-user-doctor"></i></div>
-        <h3>Expert Contacts</h3>
-        <p>In case of severe diseases, we immediately connect you with the nearest Ayurvedic practitioners.</p>
-    </div>
-</section>
-{% endblock %}
 
-{% block scripts %}
-<script>
-    // GSAP Animations for Landing Page
-    document.addEventListener("DOMContentLoaded", () => {
-        gsap.from(".hero-title", { duration: 1, y: 50, opacity: 0, ease: "power3.out" });
-        gsap.from(".hero-subtitle", { duration: 1, y: 30, opacity: 0, ease: "power3.out", delay: 0.2 });
-        gsap.from(".hero-actions", { duration: 1, y: 20, opacity: 0, ease: "power3.out", delay: 0.4 });
-        
-        gsap.from("#visualCard1", { duration: 1, x: 50, opacity: 0, ease: "back.out(1.7)", delay: 0.5 });
-        gsap.from("#visualCard2", { duration: 1, x: -50, opacity: 0, ease: "back.out(1.7)", delay: 0.7 });
-        
-        gsap.from(".feature-item", { 
-            duration: 0.8, 
-            y: 40, 
-            opacity: 0, 
-            stagger: 0.2, 
-            ease: "power2.out",
-            scrollTrigger: {
-                trigger: ".features",
-                start: "top 80%"
-            }
-        });
-    });
-</script>
-{% endblock %}
+    <!-- ── How It Works ───────────────────────────────────── -->
+    <div class="section" id="howitworks">
+        <h2 class="section-title">Sacred 3‑Step Flow</h2>
+        <div class="steps-container">
+            <div class="step-item">
+                <div class="step-circle">1</div>
+                <h3>Dosha Quiz</h3>
+                <p>Answer intuitive questions about body &amp; mind.</p>
+            </div>
+            <div class="step-item">
+                <div class="step-circle">2</div>
+                <h3>AI Analysis</h3>
+                <p>Neural engine decodes imbalance &amp; Prakriti.</p>
+            </div>
+            <div class="step-item">
+                <div class="step-circle">3</div>
+                <h3>Personalised Remedies</h3>
+                <p>Herbal formulas + lifestyle protocol.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── CTA Section ────────────────────────────────────── -->
+    <div class="cta-section" id="cta">
+        <h2 style="font-family: 'Cormorant Garamond'; font-size: 2rem;">
+            Begin Your Healing Journey
+        </h2>
+        <p>Join 10k+ souls restoring balance with AI + Ayurveda</p>
+        <div class="cta-form">
+            <input type="email" placeholder="your@email.com" id="ctaEmail">
+            <button class="btn-gradient" id="ctaFooterBtn">Start Free Assessment →</button>
+        </div>
+    </div>
+
+    <!-- ── Footer ─────────────────────────────────────────── -->
+    <footer>
+        <div class="logo" style="font-size: 1.4rem;">✦ AyurSense</div>
+        <div>
+            <h4>Product</h4>
+            <p>Dosha AI</p>
+            <p>Herbarium</p>
+            <p>Pricing</p>
+        </div>
+        <div>
+            <h4>Company</h4>
+            <p>About</p>
+            <p>Science</p>
+            <p>Press</p>
+        </div>
+        <div>
+            <h4>Legal</h4>
+            <p>Privacy</p>
+            <p>Terms</p>
+        </div>
+        <div>
+            <i class="fab fa-instagram"></i>
+            <i class="fab fa-twitter"></i>
+            <i class="fab fa-linkedin"></i>
+            <br>© 2025 AyurSense
+        </div>
+    </footer>
+
+    <!-- ── Auth Modal ──────────────────────────────────────── -->
+    <div id="authModal" class="modal">
+        <div class="modal-card">
+            <span class="close-modal">&times;</span>
+
+            <div class="tabs">
+                <button class="tab-btn active-tab" data-tab="login">Login</button>
+                <button class="tab-btn"            data-tab="register">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form">
+                <input type="email"    id="loginEmail"    placeholder="Email"    required>
+                <input type="password" id="loginPassword" placeholder="Password" required>
+                <button class="btn-gradient" id="doLogin">Login</button>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form" style="display:none;">
+                <input type="text"     id="regName"     placeholder="Full Name" required>
+                <input type="email"    id="regEmail"    placeholder="Email"     required>
+                <input type="password" id="regPassword" placeholder="Password"  required>
+                <input type="number"   id="regAge"      placeholder="Age">
+                <select id="regGender">
+                    <option value="">Select Gender</option>
+                    <option>Male</option>
+                    <option>Female</option>
+                    <option>Other</option>
+                </select>
+                <input type="text" id="regDistrict" placeholder="District (e.g. Mumbai)">
+                <button class="btn-gradient" id="doRegister">Sign Up →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── App Script ─────────────────────────────────────── -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+

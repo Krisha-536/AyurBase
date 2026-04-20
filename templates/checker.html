@@ -1,50 +1,305 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurSense | Symptom Checker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+        .checker-wrap {
+            min-height: 100vh;
+            padding: 110px 5% 60px;
+            position: relative;
+            z-index: 2;
+            max-width: 900px;
+            margin: 0 auto;
+        }
 
-{% block content %}
-<div class="checker-container">
-    <div class="checker-header text-center">
-        <h2>Symptom Assessment</h2>
-        <p>Select all the symptoms you are experiencing from the list below.</p>
+        .checker-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+        }
+
+        .checker-sub {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Search bar */
+        .symptom-search {
+            position: relative;
+            margin-bottom: 1.2rem;
+        }
+
+        .symptom-search input {
+            width: 100%;
+            padding: 0.85rem 1.2rem 0.85rem 3rem;
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 60px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s;
+            backdrop-filter: blur(8px);
+        }
+
+        .symptom-search input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 12px var(--accent-gold-glow);
+        }
+
+        .symptom-search .search-icon {
+            position: absolute;
+            left: 1.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--accent-gold);
+            font-size: 0.9rem;
+        }
+
+        .symptom-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            max-height: 340px;
+            overflow-y: auto;
+            padding: 0.5rem 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-gold) transparent;
+        }
+
+        .symptom-pill {
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 60px;
+            padding: 0.45rem 1rem;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            color: var(--text-secondary);
+            backdrop-filter: blur(6px);
+        }
+
+        .symptom-pill:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .symptom-pill.selected {
+            background: linear-gradient(135deg, rgba(45,106,79,0.4), rgba(230,200,122,0.2));
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+            font-weight: 600;
+            box-shadow: 0 0 8px var(--accent-gold-glow);
+        }
+
+        .selected-section {
+            margin: 1.5rem 0;
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 24px;
+            padding: 1.2rem 1.5rem;
+            backdrop-filter: blur(8px);
+            min-height: 70px;
+        }
+
+        .selected-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .selected-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .selected-tag {
+            background: linear-gradient(135deg, rgba(45,106,79,0.5), rgba(230,200,122,0.3));
+            border: 1px solid var(--accent-gold);
+            border-radius: 60px;
+            padding: 0.3rem 0.8rem 0.3rem 1rem;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 500;
+        }
+
+        .selected-tag .remove-tag {
+            cursor: pointer;
+            font-size: 0.75rem;
+            opacity: 0.7;
+            transition: opacity 0.15s;
+        }
+
+        .selected-tag .remove-tag:hover { opacity: 1; }
+
+        .empty-msg {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-style: italic;
+        }
+
+        .counter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .count-badge {
+            background: rgba(230,200,122,0.15);
+            border: 1px solid rgba(230,200,122,0.3);
+            border-radius: 60px;
+            padding: 0.25rem 0.8rem;
+            font-size: 0.8rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .count-badge.ready {
+            background: rgba(45,106,79,0.25);
+            border-color: var(--accent-green-light);
+            color: #74c69d;
+        }
+
+        .analyse-btn {
+            width: 100%;
+            background: var(--gradient-1);
+            border: none;
+            padding: 1rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            margin-top: 0.5rem;
+        }
+
+        .analyse-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(230,200,122,0.4);
+        }
+
+        .analyse-btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid rgba(255,255,255,0.4);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            vertical-align: middle;
+            margin-right: 0.4rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Error message */
+        .checker-error {
+            background: rgba(220,50,50,0.12);
+            border: 1px solid rgba(220,50,50,0.3);
+            border-radius: 16px;
+            padding: 0.8rem 1.2rem;
+            color: #ff6b6b;
+            font-size: 0.88rem;
+            margin-top: 0.8rem;
+            display: none;
+        }
+
+        .logout-link {
+            background: none;
+            border: 1px solid rgba(230,200,122,0.3);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-link:hover {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        @media (max-width: 600px) {
+            .checker-title { font-size: 2rem; }
+            .checker-wrap { padding-top: 95px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="particles" id="particles"></div>
+
+    <nav class="navbar" id="navbar">
+        <div class="logo">✦ AyurSense</div>
+        <div style="display:flex; align-items:center; gap:1rem;">
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button class="logout-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="checker-wrap">
+        <h1 class="checker-title">Symptom Checker</h1>
+        <p class="checker-sub">Select at least 3 symptoms you are experiencing. Our AI will analyse them and recommend personalised Ayurvedic remedies.</p>
+
+        <div class="symptom-search">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="symptomSearch" placeholder="Search symptoms...">
+        </div>
+
+        <div class="counter-row">
+            <span class="count-badge" id="countBadge">0 selected</span>
+            <small style="color:var(--text-secondary); font-size:0.8rem;">Min. 3 required</small>
+        </div>
+
+        <div class="symptom-grid" id="symptomGrid">
+            <!-- Populated by JS from Flask-injected symptoms list -->
+        </div>
+
+        <div class="selected-section">
+            <div class="selected-label">Selected Symptoms</div>
+            <div class="selected-tags" id="selectedTags">
+                <span class="empty-msg">None selected yet</span>
+            </div>
+        </div>
+
+        <button class="analyse-btn" id="analyseBtn" disabled>
+            Analyse My Symptoms →
+        </button>
+        <div class="checker-error" id="checkerError"></div>
     </div>
 
-    <div class="checker-box glass-card">
-        <div class="search-box">
-            <i class="fa-solid fa-magnifying-glass search-icon"></i>
-            <input type="text" id="symptomSearch" placeholder="Search symptoms (e.g., headache, fever)...">
-        </div>
-
-        <div class="symptoms-list" id="symptomsList">
-            {% for symptom in symptoms %}
-            <label class="symptom-item">
-                <input type="checkbox" value="{{ symptom }}">
-                <span class="checkmark"></span>
-                <span class="symptom-name">{{ symptom.replace('_', ' ').title() }}</span>
-            </label>
-            {% endfor %}
-            {% if not symptoms %}
-            <p class="error-msg">Symptoms could not be loaded. Please ensure the models are trained.</p>
-            {% endif %}
-        </div>
-
-        <div class="selected-symptoms-tags" id="selectedTags">
-            <!-- Badges for selected symptoms will appear here -->
-        </div>
-
-        <div class="text-center mt-20">
-            <button id="analyzeBtn" class="btn-primary w-100" disabled>
-                Analyze Symptoms <i class="fa-solid fa-microscope"></i>
-            </button>
-            <div id="analyzeError" class="error-msg mt-10"></div>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        gsap.from(".checker-header", { duration: 0.8, y: -20, opacity: 0, ease: "power2.out" });
-        gsap.from(".checker-box", { duration: 0.8, y: 30, opacity: 0, ease: "power2.out", delay: 0.2 });
-    });
-</script>
-{% endblock %}
+    <script>
+        const SYMPTOMS_LIST = {{ symptoms | tojson }};
+    </script>
+    <script src="{{ url_for('static', filename='js/checker.js') }}"></script>
+</body>
+</html>

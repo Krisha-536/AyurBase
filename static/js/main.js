@@ -1,252 +1,374 @@
-document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Authentication Logic ---
-    const tabLogin = document.getElementById('tabLogin');
-    const tabSignup = document.getElementById('tabSignup');
-    const formLogin = document.getElementById('loginForm');
-    const formSignup = document.getElementById('signupForm');
+/* ============================================================
+   AyurSense – main.js
+   All interactive behaviour: herbs, particles, theme, modals,
+   navigation, scroll effects.
+   ============================================================ */
 
-    if (tabLogin && tabSignup) {
-        tabLogin.addEventListener('click', () => {
-            tabLogin.classList.add('active');
-            tabSignup.classList.remove('active');
-            formLogin.classList.add('active');
-            formSignup.classList.remove('active');
-        });
-
-        tabSignup.addEventListener('click', () => {
-            tabSignup.classList.add('active');
-            tabLogin.classList.remove('active');
-            formSignup.classList.add('active');
-            formLogin.classList.remove('active');
-        });
+// ── Herb Data ──────────────────────────────────────────────
+const herbs = [
+    {
+        name: "Amla",
+        sanskrit: "Āmalakī",
+        benefit: "Immunity",
+        dosha: "Tri-doshic",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8">
+                <path d="M24 12 L28 20 L34 22 L28 28 L30 36 L24 32 L18 36 L20 28 L14 22 L20 20 Z" stroke-linecap="round"/>
+                <circle cx="24" cy="24" r="2.5" fill="currentColor" fill-opacity="0.2"/>
+              </svg>`
+    },
+    {
+        name: "Neem",
+        sanskrit: "Nimba",
+        benefit: "Skin purifier",
+        dosha: "Kapha-Pitta",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+                <path d="M24 10 L28 18 L36 20 L30 26 L32 34 L24 30 L16 34 L18 26 L12 20 L20 18 Z"/>
+                <path d="M24 24 L24 30" stroke-width="1.5"/>
+              </svg>`
+    },
+    {
+        name: "Ashwagandha",
+        sanskrit: "Aśvagandhā",
+        benefit: "Stress relief",
+        dosha: "Vata",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M24 14 L26 22 L34 22 L28 28 L30 36 L24 32 L18 36 L20 28 L14 22 L22 22 Z"/>
+                <line x1="24" y1="36" x2="24" y2="42"/>
+              </svg>`
+    },
+    {
+        name: "Turmeric",
+        sanskrit: "Haridrā",
+        benefit: "Anti-inflammatory",
+        dosha: "All",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M24 12 L28 20 L36 20 L30 26 L32 34 L24 28 L16 34 L18 26 L12 20 L20 20 Z"/>
+                <circle cx="24" cy="22" r="2.2"/>
+              </svg>`
+    },
+    {
+        name: "Tulsi",
+        sanskrit: "Tulasī",
+        benefit: "Respiratory",
+        dosha: "Kapha",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M24 10 L26 18 L34 18 L28 24 L30 32 L24 26 L18 32 L20 24 L14 18 L22 18 Z"/>
+                <path d="M24 32 L24 40"/>
+              </svg>`
+    },
+    {
+        name: "Licorice",
+        sanskrit: "Yashtimadhu",
+        benefit: "Digestion",
+        dosha: "Vata-Pitta",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M20 20 L28 20 L30 28 L24 32 L18 28 L20 20 Z"/>
+                <path d="M24 14 L24 20"/>
+              </svg>`
+    },
+    {
+        name: "Brahmi",
+        sanskrit: "Brahmi",
+        benefit: "Cognitive",
+        dosha: "Pitta",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M24 12 L28 20 L36 20 L30 26 L32 34 L24 28 L16 34 L18 26 L12 20 L20 20 Z"/>
+                <circle cx="24" cy="22" r="1.8"/>
+              </svg>`
+    },
+    {
+        name: "Sandalwood",
+        sanskrit: "Chandana",
+        benefit: "Cooling",
+        dosha: "Pitta",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M20 16 L28 16 L32 24 L24 32 L16 24 L20 16 Z"/>
+                <path d="M24 32 L24 40"/>
+              </svg>`
+    },
+    {
+        name: "Gotu Kola",
+        sanskrit: "Mandūkaparṇī",
+        benefit: "Longevity",
+        dosha: "Tri-doshic",
+        svg: `<svg class="herb-svg" viewBox="0 0 48 48" stroke="currentColor">
+                <path d="M24 14 L28 20 L34 20 L28 26 L30 32 L24 26 L18 32 L20 26 L14 20 L20 20 Z"/>
+                <line x1="24" y1="32" x2="24" y2="38"/>
+              </svg>`
     }
+];
 
-    if (formLogin) {
-        formLogin.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const errorDiv = document.getElementById('loginError');
-
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    window.location.href = '/checker';
-                } else {
-                    errorDiv.innerText = data.error || "Login failed";
-                }
-            } catch (err) {
-                errorDiv.innerText = "Network error. Try again.";
-            }
-        });
-    }
-
-    if (formSignup) {
-        formSignup.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const errorDiv = document.getElementById('signupError');
-            
-            const payload = {
-                name: document.getElementById('signupName').value,
-                email: document.getElementById('signupEmail').value,
-                password: document.getElementById('signupPassword').value,
-                age: document.getElementById('signupAge').value,
-                gender: document.getElementById('signupGender').value,
-                dosha: document.getElementById('signupDosha').value,
-                district: document.getElementById('signupDistrict').value
-            };
-
-            try {
-                const res = await fetch('/api/auth/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                const data = await res.json();
-                if (data.success) {
-                    window.location.href = '/checker';
-                } else {
-                    errorDiv.innerText = data.error || "Signup failed";
-                }
-            } catch (err) {
-                errorDiv.innerText = "Network error. Try again.";
-            }
-        });
-    }
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = '/';
-        });
-    }
-
-    // --- Symptom Checker Logic ---
-    const searchInput = document.getElementById('symptomSearch');
-    const symptomsList = document.getElementById('symptomsList');
-    const selectedTags = document.getElementById('selectedTags');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    let selectedSymptoms = [];
-
-    if (searchInput && symptomsList) {
-        const labels = symptomsList.querySelectorAll('.symptom-item');
-        
-        searchInput.addEventListener('input', (e) => {
-            const val = e.target.value.toLowerCase();
-            labels.forEach(label => {
-                const text = label.querySelector('.symptom-name').innerText.toLowerCase();
-                if (text.includes(val)) {
-                    label.style.display = 'flex';
-                } else {
-                    label.style.display = 'none';
-                }
-            });
-        });
-
-        labels.forEach(label => {
-            const checkbox = label.querySelector('input[type="checkbox"]');
-            checkbox.addEventListener('change', () => {
-                const symptomRaw = checkbox.value;
-                const symptomName = label.querySelector('.symptom-name').innerText;
-                
-                if (checkbox.checked) {
-                    if (!selectedSymptoms.includes(symptomRaw)) {
-                        selectedSymptoms.push(symptomRaw);
-                        addTag(symptomRaw, symptomName, checkbox);
-                    }
-                } else {
-                    selectedSymptoms = selectedSymptoms.filter(s => s !== symptomRaw);
-                    removeTagDOM(symptomRaw);
-                }
-                updateAnalyzeBtn();
-            });
-        });
-    }
-
-    function addTag(raw, name, checkbox) {
-        const tag = document.createElement('div');
-        tag.className = 'symptom-tag';
-        tag.id = `tag-${raw}`;
-        tag.innerHTML = `
-            ${name} 
-            <span class="remove-tag" data-raw="${raw}">&times;</span>
+// ── Render Herb Grid ────────────────────────────────────────
+function renderHerbs() {
+    const herbGrid = document.getElementById('herbGrid');
+    herbs.forEach((h, idx) => {
+        const card = document.createElement('div');
+        card.className = 'herb-card';
+        card.style.animationDelay = `${idx * 0.04}s`;
+        card.innerHTML = `
+            ${h.svg}
+            <div class="herb-name">${h.name}</div>
+            <div class="sanskrit">${h.sanskrit}</div>
+            <div class="benefit-badge">${h.benefit}</div>
+            <div class="dosha-tag">${h.dosha}</div>
         `;
-        selectedTags.appendChild(tag);
+        herbGrid.appendChild(card);
+    });
+}
 
-        tag.querySelector('.remove-tag').addEventListener('click', (e) => {
-            const r = e.target.getAttribute('data-raw');
-            selectedSymptoms = selectedSymptoms.filter(s => s !== r);
-            checkbox.checked = false;
-            removeTagDOM(r);
-            updateAnalyzeBtn();
-        });
+// ── Floating Particles ──────────────────────────────────────
+function generateParticles() {
+    const container = document.getElementById('particles');
+    for (let i = 0; i < 45; i++) {
+        const p = document.createElement('div');
+        p.classList.add('particle');
+        const size = Math.random() * 3 + 1;
+        p.style.width  = size + 'px';
+        p.style.height = size + 'px';
+        p.style.left   = Math.random() * 100 + '%';
+        p.style.animationDuration = 12 + Math.random() * 20 + 's';
+        p.style.animationDelay    = Math.random() * 15 + 's';
+        container.appendChild(p);
     }
+}
 
-    function removeTagDOM(raw) {
-        const tag = document.getElementById(`tag-${raw}`);
-        if (tag) tag.remove();
-    }
+// ── Staggered Headline Animation ────────────────────────────
+function initHeadline() {
+    document.querySelectorAll('.word').forEach((w, i) => {
+        w.style.animationDelay = `${i * 0.1}s`;
+    });
+}
 
-    function updateAnalyzeBtn() {
-        const errorDiv = document.getElementById('analyzeError');
-        if (selectedSymptoms.length >= 3) {
-            analyzeBtn.disabled = false;
-            errorDiv.innerText = '';
-        } else if (selectedSymptoms.length > 0) {
-            analyzeBtn.disabled = true;
-            errorDiv.innerText = 'Please select at least 3 symptoms for a more accurate prediction.';
-        } else {
-            analyzeBtn.disabled = true;
-            errorDiv.innerText = '';
+// ── Theme Toggle ────────────────────────────────────────────
+function initThemeToggle() {
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+        const icon = themeToggle.querySelector('i');
+        icon.className = document.body.classList.contains('light')
+            ? 'fas fa-sun'
+            : 'fas fa-moon';
+    });
+}
+
+// ── Auth Modal ──────────────────────────────────────────────
+function initModal() {
+    const modal       = document.getElementById('authModal');
+    const openLogin   = document.getElementById('openLoginBtn');
+    const openSignup  = document.getElementById('openSignupBtn');
+    const closeBtn    = document.querySelector('.close-modal');
+    const loginTab    = document.querySelector('[data-tab="login"]');
+    const regTab      = document.querySelector('[data-tab="register"]');
+    const loginDiv    = document.getElementById('loginForm');
+    const regDiv      = document.getElementById('registerForm');
+
+    const showModal = () => { modal.style.display = 'flex'; };
+    const hideModal = () => { modal.style.display = 'none'; };
+
+    const switchToLogin = () => {
+        loginDiv.style.display = 'block';
+        regDiv.style.display   = 'none';
+        loginTab.classList.add('active-tab');
+        regTab.classList.remove('active-tab');
+    };
+
+    const switchToRegister = () => {
+        regDiv.style.display   = 'block';
+        loginDiv.style.display = 'none';
+        regTab.classList.add('active-tab');
+        loginTab.classList.remove('active-tab');
+    };
+
+    openLogin.addEventListener('click',  () => { showModal(); switchToLogin(); });
+    openSignup.addEventListener('click', () => { showModal(); switchToRegister(); });
+    closeBtn.addEventListener('click', hideModal);
+    modal.addEventListener('click', (e) => { if (e.target === modal) hideModal(); });
+    loginTab.addEventListener('click', switchToLogin);
+    regTab.addEventListener('click',   switchToRegister);
+
+    // ── Helper: inline modal message ─────────────────────────
+    function showModalMsg(msg, isError = false) {
+        let el = document.getElementById('modalMsg');
+        if (!el) {
+            el = document.createElement('div');
+            el.id = 'modalMsg';
+            el.style.cssText = [
+                'margin-top:0.8rem', 'padding:0.6rem 1rem',
+                'border-radius:40px', 'font-size:0.85rem',
+                'text-align:center', 'font-weight:500'
+            ].join(';');
+            document.querySelector('.modal-card').appendChild(el);
         }
+        el.textContent = msg;
+        el.style.background = isError ? 'rgba(220,50,50,0.15)' : 'rgba(45,106,79,0.2)';
+        el.style.color      = isError ? '#ff6b6b'             : 'var(--accent-gold)';
+        el.style.border     = isError
+            ? '1px solid rgba(220,50,50,0.3)'
+            : '1px solid rgba(230,200,122,0.3)';
     }
 
-    if (analyzeBtn) {
-        analyzeBtn.addEventListener('click', async () => {
-            const errorDiv = document.getElementById('analyzeError');
-            analyzeBtn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...';
-            analyzeBtn.disabled = true;
-            errorDiv.innerText = '';
-
-            try {
-                const res = await fetch('/api/predict', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ symptoms: selectedSymptoms })
-                });
-                const data = await res.json();
-
-                if (res.ok) {
-                    // Store result in sessionStorage and redirect
-                    sessionStorage.setItem('ayurResult', JSON.stringify(data));
-                    window.location.href = '/results';
-                } else {
-                    errorDiv.innerText = data.error || "An error occurred during analysis.";
-                    analyzeBtn.innerHTML = 'Analyze Symptoms <i class="fa-solid fa-microscope"></i>';
-                    analyzeBtn.disabled = false;
-                }
-            } catch (err) {
-                errorDiv.innerText = "Network error. Is the server running?";
-                analyzeBtn.innerHTML = 'Analyze Symptoms <i class="fa-solid fa-microscope"></i>';
-                analyzeBtn.disabled = false;
-            }
-        });
+    function setLoading(btnId, loading) {
+        const btn = document.getElementById(btnId);
+        btn.disabled    = loading;
+        btn.textContent = loading
+            ? 'Please wait...'
+            : (btnId === 'doLogin' ? 'Login' : 'Sign Up →');
     }
 
-    // --- Results Page Logic ---
-    const resultsContainer = document.querySelector('.results-container');
-    if (resultsContainer && window.location.pathname === '/results') {
-        const resultDataStr = sessionStorage.getItem('ayurResult');
-        const loading = document.getElementById('loadingResults');
-        const content = document.getElementById('resultsContent');
+    // ── LOGIN ──────────────────────────────────────────────────
+    document.getElementById('doLogin').addEventListener('click', async () => {
+        const email    = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) { showModalMsg('Please fill in all fields.', true); return; }
 
-        if (!resultDataStr) {
-            window.location.href = '/checker';
-            return;
-        }
-
-        const data = JSON.parse(resultDataStr);
-        
-        setTimeout(() => {
-            loading.classList.add('hidden');
-            content.classList.remove('hidden');
-
-            document.getElementById('resDisease').innerText = data.disease;
-
-            if (data.is_severe) {
-                document.getElementById('severeResult').classList.remove('hidden');
-                document.getElementById('resSevereMsg').innerText = data.message;
-                
-                const docsList = document.getElementById('doctorsList');
-                if (data.doctors && data.doctors.length > 0) {
-                    docsList.innerHTML = data.doctors.map(d => `
-                        <div class="doctor-item">
-                            <h4><i class="fa-solid fa-stethoscope"></i> ${d.name}</h4>
-                            <div class="sub-text"><i class="fa-solid fa-location-dot"></i> ${d.address}</div>
-                            <div class="sub-text mt-10"><i class="fa-solid fa-phone"></i> ${d.contact}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    docsList.innerHTML = '<p class="sub-text">No nearby doctors available in your district.</p>';
-                }
+        setLoading('doLogin', true);
+        try {
+            const res  = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showModalMsg('\u2705 Login successful! Redirecting...');
+                setTimeout(() => { window.location.href = '/checker'; }, 800);
             } else {
-                document.getElementById('normalResult').classList.remove('hidden');
-                document.getElementById('resRemedy').innerText = data.remedy;
-                document.getElementById('resMedicines').innerText = data.medicines;
-                document.getElementById('resReasoning').innerText = data.reasoning;
-                document.getElementById('resPreventive').innerText = data.preventive_advice;
+                showModalMsg(data.error || 'Login failed. Try again.', true);
             }
+        } catch (err) {
+            showModalMsg('Network error. Is the server running?', true);
+        } finally {
+            setLoading('doLogin', false);
+        }
+    });
 
-            gsap.from(".result-card", { duration: 0.8, y: 30, opacity: 0, stagger: 0.2, ease: "power2.out" });
+    // ── REGISTER ───────────────────────────────────────────────
+    document.getElementById('doRegister').addEventListener('click', async () => {
+        const name     = document.getElementById('regName').value.trim();
+        const email    = document.getElementById('regEmail').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const age      = document.getElementById('regAge').value;
+        const gender   = document.getElementById('regGender').value;
+        const district = document.getElementById('regDistrict').value.trim();
 
-        }, 1000); // Fake small delay for the spinner animation
-    }
+        if (!name || !email || !password) {
+            showModalMsg('Name, email and password are required.', true); return;
+        }
+
+        setLoading('doRegister', true);
+        try {
+            const res  = await fetch('/api/auth/signup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, email, password, age, gender, district })
+            });
+            const data = await res.json();
+            if (res.ok && data.success) {
+                showModalMsg('\u2728 Welcome ' + name + '! Redirecting...');
+                setTimeout(() => { window.location.href = '/checker'; }, 800);
+            } else {
+                showModalMsg(data.error || 'Signup failed. Try again.', true);
+            }
+        } catch (err) {
+            showModalMsg('Network error. Is the server running?', true);
+        } finally {
+            setLoading('doRegister', false);
+        }
+    });
+
+    // Clear message on tab switch
+    [loginTab, regTab].forEach(t => t.addEventListener('click', () => {
+        const el = document.getElementById('modalMsg'); if (el) el.textContent = '';
+    }));
+
+    // Expose for CTA buttons
+    window._hideModal        = hideModal;
+    window._showModal        = showModal;
+    window._switchToRegister = switchToRegister;
+}
+
+// ── Smooth Scroll with Navbar Offset ───────────────────────
+function initSmoothScroll() {
+    document.querySelectorAll('.nav-link').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                const navbarHeight = document.querySelector('.navbar').offsetHeight;
+                const offsetPosition =
+                    target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 15;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            }
+            document.getElementById('navLinks')?.classList.remove('mobile-open');
+        });
+    });
+}
+
+// ── Active Nav Link on Scroll ───────────────────────────────
+function initActiveLinks() {
+    const sections = document.querySelectorAll('#home, #features, #howitworks, #herbarium');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    const update = () => {
+        let current = '';
+        const navbarHeight = document.querySelector('.navbar').offsetHeight;
+        sections.forEach(section => {
+            const top    = section.offsetTop - navbarHeight - 80;
+            const bottom = top + section.offsetHeight;
+            if (window.scrollY >= top && window.scrollY < bottom) {
+                current = section.getAttribute('id');
+            }
+        });
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').substring(1) === current) {
+                link.classList.add('active');
+            }
+        });
+    };
+
+    window.addEventListener('scroll', update);
+    window.addEventListener('load',   update);
+}
+
+// ── Navbar Scroll Effect ────────────────────────────────────
+function initNavbarScroll() {
+    const navbar = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+}
+
+// ── Hamburger Menu ──────────────────────────────────────────
+function initHamburger() {
+    document.getElementById('hamburger').addEventListener('click', () => {
+        document.getElementById('navLinks').classList.toggle('mobile-open');
+    });
+}
+
+// ── CTA Buttons ─────────────────────────────────────────────
+function initCTAButtons() {
+    document.getElementById('ctaMain').addEventListener('click', () => {
+        window._showModal();
+        window._switchToRegister();
+    });
+    document.getElementById('ctaFooterBtn').addEventListener('click', () => {
+        window._showModal();
+        window._switchToRegister();
+    });
+}
+
+// ── Bootstrap Everything ────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    renderHerbs();
+    generateParticles();
+    initHeadline();
+    initThemeToggle();
+    initModal();
+    initSmoothScroll();
+    initActiveLinks();
+    initNavbarScroll();
+    initHamburger();
+    initCTAButtons();
 });
