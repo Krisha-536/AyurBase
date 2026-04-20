@@ -33,8 +33,10 @@ try:
     remedy_encoders = joblib.load('remedy_encoders.pkl')
     
     # Load dataset for querying remedy details and doctors
-    remedy_df = pd.read_csv('remedy.csv')
+    remedy_df = pd.read_csv('remedy.csv').fillna('Unknown')
     doctors_df = pd.read_csv('ayurvedic_doctors.csv')
+    doctors_df['District Name'] = doctors_df['District Name'].ffill()
+    doctors_df = doctors_df.fillna('Unknown')
 except Exception as e:
     print(f"Warning: Models not loaded. Please wait for train_models.py to finish. Error: {e}")
     disease_model = None
@@ -153,8 +155,8 @@ def predict():
     data = request.json
     selected_symptoms = data.get('symptoms', []) # list of strings
     
-    if not selected_symptoms or len(selected_symptoms) < 3:
-        return jsonify({"error": "Please provide at least 3 symptoms for an accurate prediction."}), 400
+    if not selected_symptoms or len(selected_symptoms) < 1:
+        return jsonify({"error": "Please provide at least 1 symptom for an accurate prediction."}), 400
         
     # 1. Disease Prediction
     # Create one-hot array
@@ -182,6 +184,8 @@ def predict():
             # Simple substring match
             docs = doctors_df[doctors_df['District Name'].str.contains(district, case=False, na=False)]
             for _, row in docs.iterrows():
+                if row.get('Name', 'Unknown') == 'Unknown':
+                    continue
                 nearby_doctors.append({
                     "name": row.get('Name', 'Unknown'),
                     "address": row.get('Address', 'Unknown'),

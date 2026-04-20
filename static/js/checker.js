@@ -60,8 +60,8 @@ function updateSelectedTags() {
 function updateCounter() {
     const n = selected.size;
     countBadge.textContent = `${n} selected`;
-    countBadge.className   = 'count-badge' + (n >= 3 ? ' ready' : '');
-    analyseBtn.disabled    = n < 3;
+    countBadge.className   = 'count-badge' + (n >= 1 ? ' ready' : '');
+    analyseBtn.disabled    = n < 1;
 }
 
 searchInput.addEventListener('input', () => renderPills(searchInput.value));
