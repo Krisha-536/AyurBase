@@ -1,29 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AyurSense | AI Ayurvedic Remedy Platform</title>
 
-    <!-- Google Fonts: Elegant Serif + Modern Sans -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
+        rel="stylesheet">
 
-    <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
-    <!-- App Styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
+
 <body>
 
-    <!-- ── Animated Background ─────────────────────────────── -->
     <div class="blob-bg">
         <div class="blob blob-1"></div>
         <div class="blob blob-2"></div>
     </div>
     <div class="particles" id="particles"></div>
 
-    <!-- ── Fixed Glassmorphism Navbar ─────────────────────── -->
     <nav class="navbar" id="navbar">
         <div class="logo">✦ AyurSense</div>
 
@@ -32,34 +31,33 @@
         </div>
 
         <div class="nav-links" id="navLinks">
-            <a href="#home"       class="nav-link" data-section="home">Home</a>
-            <a href="#features"   class="nav-link" data-section="features">Features</a>
+            <a href="#home" class="nav-link" data-section="home">Home</a>
+            <a href="#features" class="nav-link" data-section="features">Features</a>
             <a href="#howitworks" class="nav-link" data-section="howitworks">How It Works</a>
-            <a href="#herbarium"  class="nav-link" data-section="herbarium">Herbarium</a>
+            <a href="#herbarium" class="nav-link" data-section="herbarium">Herbarium</a>
         </div>
 
         <div class="nav-buttons">
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>
             </button>
-            <button class="btn-ghost"    id="openLoginBtn">Login</button>
+            <button class="btn-ghost" id="openLoginBtn">Login</button>
             <button class="btn-gradient" id="openSignupBtn">Sign Up</button>
         </div>
-    </nav>
+    </nav>z
 
-    <!-- ── Hero Section ───────────────────────────────────── -->
     <div class="hero" id="home">
         <div class="hero-left">
             <h1 class="animated-headline">
-                <span class="word">AI-Powered</span>
-                <span class="word">Ayurvedic</span><br>
-                <span class="word">Wisdom,</span>
+                <span class="word">Ancient</span>
+                <span class="word">Healing,</span><br>
+                <span class="word">Smartly</span>
                 <span class="word">Personalised</span>
             </h1>
 
             <p class="hero-sub">
-                Discover your unique dosha &amp; get ancient remedies blended with neural
-                intelligence. Backed by ML models trained on 5000+ years of Ayurveda.
+                Discover your unique dosha &amp; get ancient remedies powered by intelligent
+                analysis. Backed by ML models trained on 5000+ years of Ayurveda.
             </p>
 
             <div class="steps-mini">
@@ -71,13 +69,11 @@
             <button class="glow-cta" id="ctaMain">Begin Healing Journey →</button>
         </div>
 
-        <!-- Herb grid is rendered by JS into this container -->
         <div class="hero-right" id="herbarium">
             <div class="herb-grid" id="herbGrid"></div>
         </div>
     </div>
 
-    <!-- ── Features Section ───────────────────────────────── -->
     <div class="section" id="features">
         <h2 class="section-title">Intelligent Features</h2>
         <div class="feature-grid">
@@ -104,7 +100,6 @@
         </div>
     </div>
 
-    <!-- ── How It Works ───────────────────────────────────── -->
     <div class="section" id="howitworks">
         <h2 class="section-title">Sacred 3‑Step Flow</h2>
         <div class="steps-container">
@@ -126,7 +121,6 @@
         </div>
     </div>
 
-    <!-- ── CTA Section ────────────────────────────────────── -->
     <div class="cta-section" id="cta">
         <h2 style="font-family: 'Cormorant Garamond'; font-size: 2rem;">
             Begin Your Healing Journey
@@ -138,7 +132,6 @@
         </div>
     </div>
 
-    <!-- ── Footer ─────────────────────────────────────────── -->
     <footer>
         <div class="logo" style="font-size: 1.4rem;">✦ AyurSense</div>
         <div>
@@ -166,29 +159,26 @@
         </div>
     </footer>
 
-    <!-- ── Auth Modal ──────────────────────────────────────── -->
     <div id="authModal" class="modal">
         <div class="modal-card">
             <span class="close-modal">&times;</span>
 
             <div class="tabs">
                 <button class="tab-btn active-tab" data-tab="login">Login</button>
-                <button class="tab-btn"            data-tab="register">Register</button>
+                <button class="tab-btn" data-tab="register">Register</button>
             </div>
 
-            <!-- Login Form -->
             <div id="loginForm" class="auth-form">
-                <input type="email"    id="loginEmail"    placeholder="Email"    required>
+                <input type="email" id="loginEmail" placeholder="Email" required>
                 <input type="password" id="loginPassword" placeholder="Password" required>
                 <button class="btn-gradient" id="doLogin">Login</button>
             </div>
 
-            <!-- Register Form -->
             <div id="registerForm" class="auth-form" style="display:none;">
-                <input type="text"     id="regName"     placeholder="Full Name" required>
-                <input type="email"    id="regEmail"    placeholder="Email"     required>
-                <input type="password" id="regPassword" placeholder="Password"  required>
-                <input type="number"   id="regAge"      placeholder="Age">
+                <input type="text" id="regName" placeholder="Full Name" required>
+                <input type="email" id="regEmail" placeholder="Email" required>
+                <input type="password" id="regPassword" placeholder="Password" required>
+                <input type="number" id="regAge" placeholder="Age">
                 <select id="regGender">
                     <option value="">Select Gender</option>
                     <option>Male</option>
@@ -201,8 +191,7 @@
         </div>
     </div>
 
-    <!-- ── App Script ─────────────────────────────────────── -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
-</html>
 
+</html>
