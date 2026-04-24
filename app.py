@@ -59,6 +59,12 @@ def checker():
         return redirect(url_for('auth'))
     return render_template('checker.html', symptoms=symptoms_list if disease_model else [])
 
+@app.route('/dosha-quiz')
+def dosha_quiz():
+    if 'user_id' not in session:
+        return redirect(url_for('auth'))
+    return render_template('dosha_quiz.html')
+
 @app.route('/results')
 def results():
     if 'user_id' not in session:
@@ -155,8 +161,8 @@ def predict():
     data = request.json
     selected_symptoms = data.get('symptoms', []) # list of strings
     
-    if not selected_symptoms or len(selected_symptoms) < 1:
-        return jsonify({"error": "Please provide at least 1 symptom for an accurate prediction."}), 400
+    if not selected_symptoms or len(selected_symptoms) < 2:
+        return jsonify({"error": "Please provide at least 2 symptoms for an accurate prediction."}), 400
         
     # 1. Disease Prediction
     # Create one-hot array

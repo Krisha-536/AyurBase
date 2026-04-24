@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <style>
+
         .checker-wrap {
             min-height: 100vh;
             padding: 110px 5% 60px;
@@ -34,7 +35,6 @@
             margin-bottom: 2rem;
         }
 
-        /* Search bar */
         .symptom-search {
             position: relative;
             margin-bottom: 1.2rem;
@@ -67,6 +67,7 @@
             font-size: 0.9rem;
         }
 
+        /* Symptom pill grid */
         .symptom-grid {
             display: flex;
             flex-wrap: wrap;
@@ -220,7 +221,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Error message */
         .checker-error {
             background: rgba(220,50,50,0.12);
             border: 1px solid rgba(220,50,50,0.3);
@@ -255,12 +255,14 @@
     </style>
 </head>
 <body>
+   
     <div class="blob-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
     <div class="particles" id="particles"></div>
 
     <nav class="navbar" id="navbar">
         <div class="logo">✦ AyurSense</div>
         <div style="display:flex; align-items:center; gap:1rem;">
+            <a href="/dosha-quiz" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:none;border:1px solid rgba(230,200,122,0.2);border-radius:40px;padding:0.4rem 1rem;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent-gold)';this.style.color='var(--accent-gold)'" onmouseout="this.style.borderColor='rgba(230,200,122,0.2)';this.style.color='var(--text-secondary)'">✦ Retake Dosha Quiz</a>
             <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
             <button class="logout-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
@@ -277,11 +279,10 @@
 
         <div class="counter-row">
             <span class="count-badge" id="countBadge">0 selected</span>
-            <small style="color:var(--text-secondary); font-size:0.8rem;">Min. 3 required</small>
+            <small style="color:var(--text-secondary); font-size:0.8rem;">Min. 2 required</small>
         </div>
 
         <div class="symptom-grid" id="symptomGrid">
-            <!-- Populated by JS from Flask-injected symptoms list -->
         </div>
 
         <div class="selected-section">
@@ -298,8 +299,10 @@
     </div>
 
     <script>
+        
         const SYMPTOMS_LIST = {{ symptoms | tojson }};
     </script>
     <script src="{{ url_for('static', filename='js/checker.js') }}"></script>
 </body>
 </html>
+

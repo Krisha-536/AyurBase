@@ -1,11 +1,3 @@
-
-/* ============================================================
-   AyurSense – main.js
-   All interactive behaviour: herbs, particles, theme, modals,
-   navigation, scroll effects.
-   ============================================================ */
-
-// ── Herb Data ──────────────────────────────────────────────
 const herbs = [
     {
         name: "Amla",
@@ -99,7 +91,6 @@ const herbs = [
     }
 ];
 
-// ── Render Herb Grid ────────────────────────────────────────
 function renderHerbs() {
     const herbGrid = document.getElementById('herbGrid');
     herbs.forEach((h, idx) => {
@@ -117,7 +108,6 @@ function renderHerbs() {
     });
 }
 
-// ── Floating Particles ──────────────────────────────────────
 function generateParticles() {
     const container = document.getElementById('particles');
     for (let i = 0; i < 45; i++) {
@@ -133,14 +123,12 @@ function generateParticles() {
     }
 }
 
-// ── Staggered Headline Animation ────────────────────────────
 function initHeadline() {
     document.querySelectorAll('.word').forEach((w, i) => {
         w.style.animationDelay = `${i * 0.1}s`;
     });
 }
 
-// ── Theme Toggle ────────────────────────────────────────────
 function initThemeToggle() {
     const themeToggle = document.getElementById('themeToggle');
     themeToggle.addEventListener('click', () => {
@@ -152,7 +140,6 @@ function initThemeToggle() {
     });
 }
 
-// ── Auth Modal ──────────────────────────────────────────────
 function initModal() {
     const modal       = document.getElementById('authModal');
     const openLogin   = document.getElementById('openLoginBtn');
@@ -187,7 +174,6 @@ function initModal() {
     loginTab.addEventListener('click', switchToLogin);
     regTab.addEventListener('click',   switchToRegister);
 
-    // ── Helper: inline modal message ─────────────────────────
     function showModalMsg(msg, isError = false) {
         let el = document.getElementById('modalMsg');
         if (!el) {
@@ -216,7 +202,6 @@ function initModal() {
             : (btnId === 'doLogin' ? 'Login' : 'Sign Up →');
     }
 
-    // ── LOGIN ──────────────────────────────────────────────────
     document.getElementById('doLogin').addEventListener('click', async () => {
         const email    = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
@@ -231,8 +216,8 @@ function initModal() {
             });
             const data = await res.json();
             if (res.ok && data.success) {
-                showModalMsg('\u2705 Login successful! Redirecting...');
-                setTimeout(() => { window.location.href = '/checker'; }, 800);
+                showModalMsg('Login successful! Redirecting...');
+                setTimeout(() => { window.location.href = data.redirect || '/checker'; }, 800);
             } else {
                 showModalMsg(data.error || 'Login failed. Try again.', true);
             }
@@ -243,7 +228,6 @@ function initModal() {
         }
     });
 
-    // ── REGISTER ───────────────────────────────────────────────
     document.getElementById('doRegister').addEventListener('click', async () => {
         const name     = document.getElementById('regName').value.trim();
         const email    = document.getElementById('regEmail').value.trim();
@@ -265,8 +249,8 @@ function initModal() {
             });
             const data = await res.json();
             if (res.ok && data.success) {
-                showModalMsg('\u2728 Welcome ' + name + '! Redirecting...');
-                setTimeout(() => { window.location.href = '/checker'; }, 800);
+                showModalMsg('\u2728 Welcome ' + name + '! Discovering your dosha...');
+                setTimeout(() => { window.location.href = '/dosha-quiz'; }, 800);
             } else {
                 showModalMsg(data.error || 'Signup failed. Try again.', true);
             }
@@ -277,7 +261,6 @@ function initModal() {
         }
     });
 
-    // Clear message on tab switch
     [loginTab, regTab].forEach(t => t.addEventListener('click', () => {
         const el = document.getElementById('modalMsg'); if (el) el.textContent = '';
     }));
@@ -288,7 +271,6 @@ function initModal() {
     window._switchToRegister = switchToRegister;
 }
 
-// ── Smooth Scroll with Navbar Offset ───────────────────────
 function initSmoothScroll() {
     document.querySelectorAll('.nav-link').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
@@ -305,7 +287,6 @@ function initSmoothScroll() {
     });
 }
 
-// ── Active Nav Link on Scroll ───────────────────────────────
 function initActiveLinks() {
     const sections = document.querySelectorAll('#home, #features, #howitworks, #herbarium');
     const navLinks = document.querySelectorAll('.nav-link');
@@ -332,7 +313,6 @@ function initActiveLinks() {
     window.addEventListener('load',   update);
 }
 
-// ── Navbar Scroll Effect ────────────────────────────────────
 function initNavbarScroll() {
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
@@ -340,14 +320,12 @@ function initNavbarScroll() {
     });
 }
 
-// ── Hamburger Menu ──────────────────────────────────────────
 function initHamburger() {
     document.getElementById('hamburger').addEventListener('click', () => {
         document.getElementById('navLinks').classList.toggle('mobile-open');
     });
 }
 
-// ── CTA Buttons ─────────────────────────────────────────────
 function initCTAButtons() {
     document.getElementById('ctaMain').addEventListener('click', () => {
         window._showModal();
@@ -359,7 +337,6 @@ function initCTAButtons() {
     });
 }
 
-// ── Bootstrap Everything ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     renderHerbs();
     generateParticles();
@@ -372,3 +349,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initHamburger();
     initCTAButtons();
 });
+

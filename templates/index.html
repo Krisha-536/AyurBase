@@ -1,20 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>AyurSense | AI Ayurvedic Remedy Platform</title>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
-
 <body>
 
     <div class="blob-bg">
@@ -31,33 +27,32 @@
         </div>
 
         <div class="nav-links" id="navLinks">
-            <a href="#home" class="nav-link" data-section="home">Home</a>
-            <a href="#features" class="nav-link" data-section="features">Features</a>
+            <a href="#home"       class="nav-link" data-section="home">Home</a>
+            <a href="#features"   class="nav-link" data-section="features">Features</a>
             <a href="#howitworks" class="nav-link" data-section="howitworks">How It Works</a>
-            <a href="#herbarium" class="nav-link" data-section="herbarium">Herbarium</a>
+            <a href="#herbarium"  class="nav-link" data-section="herbarium">Herbarium</a>
         </div>
 
         <div class="nav-buttons">
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>
             </button>
-            <button class="btn-ghost" id="openLoginBtn">Login</button>
+            <button class="btn-ghost"    id="openLoginBtn">Login</button>
             <button class="btn-gradient" id="openSignupBtn">Sign Up</button>
         </div>
-    </nav>z
+    </nav>
 
     <div class="hero" id="home">
         <div class="hero-left">
             <h1 class="animated-headline">
                 <span class="word">Ancient</span>
-                <span class="word">Healing,</span><br>
-                <span class="word">Smartly</span>
+                <span class="word">Healing</span><br>
+                <span class="word">Smartly,</span>
                 <span class="word">Personalised</span>
             </h1>
 
             <p class="hero-sub">
-                Discover your unique dosha &amp; get ancient remedies powered by intelligent
-                analysis. Backed by ML models trained on 5000+ years of Ayurveda.
+                Discover your unique dosha &amp; get ancient remedies powered by intelligent analysis. Backed by ML models trained on 5000+ years of Ayurveda.
             </p>
 
             <div class="steps-mini">
@@ -165,20 +160,20 @@
 
             <div class="tabs">
                 <button class="tab-btn active-tab" data-tab="login">Login</button>
-                <button class="tab-btn" data-tab="register">Register</button>
+                <button class="tab-btn"            data-tab="register">Register</button>
             </div>
 
             <div id="loginForm" class="auth-form">
-                <input type="email" id="loginEmail" placeholder="Email" required>
+                <input type="email"    id="loginEmail"    placeholder="Email"    required>
                 <input type="password" id="loginPassword" placeholder="Password" required>
                 <button class="btn-gradient" id="doLogin">Login</button>
             </div>
 
             <div id="registerForm" class="auth-form" style="display:none;">
-                <input type="text" id="regName" placeholder="Full Name" required>
-                <input type="email" id="regEmail" placeholder="Email" required>
-                <input type="password" id="regPassword" placeholder="Password" required>
-                <input type="number" id="regAge" placeholder="Age">
+                <input type="text"     id="regName"     placeholder="Full Name" required>
+                <input type="email"    id="regEmail"    placeholder="Email"     required>
+                <input type="password" id="regPassword" placeholder="Password"  required>
+                <input type="number"   id="regAge"      placeholder="Age">
                 <select id="regGender">
                     <option value="">Select Gender</option>
                     <option>Male</option>
@@ -193,5 +188,6 @@
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>
-
 </html>
+
+

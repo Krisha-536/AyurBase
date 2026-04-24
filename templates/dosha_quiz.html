@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AyurSense | Discover Your Dosha</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700;800&family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <style>
+      
+        .quiz-wrap {
+            min-height: 100vh;
+            padding: 110px 5% 60px;
+            position: relative;
+            z-index: 2;
+            max-width: 780px;
+            margin: 0 auto;
+        }
+
+        .quiz-header { margin-bottom: 2.5rem; }
+
+        .quiz-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.4rem;
+        }
+
+        .quiz-sub {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Progress bar */
+        .progress-bar-wrap {
+            background: rgba(230,200,122,0.1);
+            border-radius: 60px;
+            height: 6px;
+            margin-bottom: 0.5rem;
+            border: 1px solid rgba(230,200,122,0.15);
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--gradient-1);
+            border-radius: 60px;
+            transition: width 0.4s ease;
+        }
+
+        .progress-label {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            text-align: right;
+            margin-bottom: 2rem;
+        }
+
+        /* Question card */
+        .question-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: var(--glass-border);
+            border-radius: 32px;
+            padding: 2rem 2rem 1.5rem;
+            margin-bottom: 1.5rem;
+            animation: fadeUp 0.4s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .q-number {
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: var(--accent-gold);
+            margin-bottom: 0.6rem;
+        }
+
+        .q-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.3;
+        }
+
+        
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .option-btn {
+            background: rgba(25,35,28,0.5);
+            border: var(--glass-border);
+            border-radius: 16px;
+            padding: 0.9rem 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            text-align: left;
+            width: 100%;
+        }
+
+        .option-btn:hover {
+            border-color: var(--accent-gold);
+            background: rgba(230,200,122,0.07);
+        }
+
+        .option-btn.selected {
+            border-color: var(--accent-gold);
+            background: linear-gradient(135deg, rgba(45,106,79,0.3), rgba(230,200,122,0.15));
+            box-shadow: 0 0 12px rgba(230,200,122,0.2);
+        }
+
+        .option-letter {
+            min-width: 28px;
+            height: 28px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .option-btn.selected .option-letter {
+            box-shadow: 0 0 8px rgba(230,200,122,0.5);
+        }
+
+        .option-content { flex: 1; }
+
+        .option-label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-bottom: 0.15rem;
+        }
+
+        .option-desc {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        
+        .dosha-hint {
+            font-size: 0.65rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-top: 0.25rem;
+            opacity: 0.7;
+        }
+
+      
+        .quiz-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            gap: 1rem;
+        }
+
+        .btn-prev {
+            background: var(--card-bg);
+            border: var(--glass-border);
+            border-radius: 60px;
+            padding: 0.75rem 1.6rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-prev:hover:not(:disabled) {
+            border-color: var(--accent-gold);
+            color: var(--accent-gold);
+        }
+
+        .btn-prev:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .btn-next {
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 60px;
+            padding: 0.75rem 2rem;
+            color: white;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            letter-spacing: 0.3px;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: scale(1.03);
+            box-shadow: 0 6px 18px rgba(230,200,122,0.35);
+        }
+
+        .btn-next:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        
+        .result-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(16px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .result-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--accent-gold);
+            border-radius: 48px;
+            padding: 2.5rem 2rem;
+            max-width: 460px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: fadeUp 0.5s ease;
+        }
+
+        .dosha-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .result-dosha-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+        }
+
+        .result-subtitle {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .dosha-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 1.2rem 0 1.8rem;
+            text-align: left;
+        }
+
+        .dosha-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .dosha-bar-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            width: 55px;
+            color: var(--text-secondary);
+        }
+
+        .dosha-bar-track {
+            flex: 1;
+            background: rgba(230,200,122,0.1);
+            border-radius: 60px;
+            height: 8px;
+            overflow: hidden;
+        }
+
+        .dosha-bar-fill {
+            height: 100%;
+            border-radius: 60px;
+            background: var(--gradient-1);
+            transition: width 1s ease;
+        }
+
+        .dosha-bar-pct {
+            font-size: 0.78rem;
+            color: var(--accent-gold);
+            font-weight: 600;
+            width: 32px;
+            text-align: right;
+        }
+
+        .btn-proceed {
+            width: 100%;
+            background: var(--gradient-1);
+            border: none;
+            border-radius: 60px;
+            padding: 0.9rem;
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.4px;
+        }
+
+        .btn-proceed:hover { transform: scale(1.02); box-shadow: 0 6px 20px rgba(230,200,122,0.4); }
+
+        .saving-msg {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 0.8rem;
+        }
+
+        .logout-link {
+            background: none;
+            border: 1px solid rgba(230,200,122,0.3);
+            border-radius: 40px;
+            padding: 0.4rem 1rem;
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .logout-link:hover { border-color: var(--accent-gold); color: var(--accent-gold); }
+
+        @media (max-width: 600px) {
+            .quiz-title { font-size: 2rem; }
+            .quiz-wrap  { padding-top: 95px; }
+            .q-text     { font-size: 1.25rem; }
+            .result-dosha-name { font-size: 2.2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="blob-bg"><div class="blob blob-1"></div><div class="blob blob-2"></div></div>
+    <div class="particles" id="particles"></div>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="logo">✦ AyurSense</div>
+        <div style="display:flex;align-items:center;gap:1rem;">
+            <a href="/checker" style="font-size:0.82rem;color:var(--text-secondary);text-decoration:none;border:1px solid rgba(230,200,122,0.2);border-radius:40px;padding:0.4rem 1rem;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--accent-gold)';this.style.color='var(--accent-gold)'" onmouseout="this.style.borderColor='rgba(230,200,122,0.2)';this.style.color='var(--text-secondary)'">Skip Quiz →</a>
+            <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon"></i></button>
+            <button class="logout-link" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+    </nav>
+
+    <div class="quiz-wrap">
+        <div class="quiz-header">
+            <h1 class="quiz-title">Discover Your Dosha</h1>
+            <p class="quiz-sub">Answer 10 simple lifestyle questions. Our AI will determine your unique Prakriti — Vata, Pitta, or Kapha — and personalise your remedies accordingly.</p>
+            <div class="progress-bar-wrap">
+                <div class="progress-bar-fill" id="progressFill" style="width:10%"></div>
+            </div>
+            <div class="progress-label" id="progressLabel">Question 1 of 10</div>
+        </div>
+
+        <div id="questionArea"></div>
+
+        <div class="quiz-nav">
+            <button class="btn-prev" id="btnPrev" disabled>← Back</button>
+            <button class="btn-next" id="btnNext" disabled>Next →</button>
+        </div>
+    </div>
+
+    <div class="result-overlay" id="resultOverlay">
+        <div class="result-card">
+            <div class="dosha-icon" id="resultIcon">🌿</div>
+            <div class="result-dosha-name" id="resultDoshaName">Vata</div>
+            <p class="result-subtitle" id="resultDesc"></p>
+            <div class="dosha-bars" id="doshaBars"></div>
+            <button class="btn-proceed" id="btnProceed">Begin Symptom Check →</button>
+            <p class="saving-msg" id="savingMsg"></p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/dosha.js') }}"></script>
+</body>
+</html>
