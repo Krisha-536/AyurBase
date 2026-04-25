@@ -265,7 +265,6 @@ function initModal() {
         const el = document.getElementById('modalMsg'); if (el) el.textContent = '';
     }));
 
-    // Expose for CTA buttons
     window._hideModal        = hideModal;
     window._showModal        = showModal;
     window._switchToRegister = switchToRegister;

@@ -236,7 +236,6 @@ async function saveAndProceed(dosha) {
 }
 
 (function init() {
-    // Particles
     const container = document.getElementById('particles');
     for (let i = 0; i < 30; i++) {
         const p = document.createElement('div');

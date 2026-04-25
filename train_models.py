@@ -8,7 +8,6 @@ import joblib
 import warnings
 warnings.filterwarnings('ignore')
 
-# Non-medical and extremely rare disease keywords to filter out
 DISEASE_BLOCKLIST_KEYWORDS = [
     'abuse', 'addiction', 'intoxication', 'withdrawal', 'suicide', 'homicide',
     'abortion', 'injury', 'fracture', 'poisoning', 'syndrome', 'behavior',
@@ -16,46 +15,40 @@ DISEASE_BLOCKLIST_KEYWORDS = [
     'foreign body', 'bite', 'burn', 'complication', 'smoking', 'tobacco'
 ]
 
-# Middle Ground Grouping: Only group redundant anatomical variants
 SYMPTOM_MERGES = {
     'Arm or Hand Pain': ['hand or finger pain', 'wrist pain', 'arm pain', 'elbow pain'],
     'Leg or Foot Pain': ['leg pain', 'hip pain', 'knee pain', 'foot or toe pain', 'ankle pain'],
     'Head or Neck Pain': ['headache', 'frontal headache', 'neck pain'],
     'Back Pain': ['back pain', 'low back pain'],
     'Abdominal or Pelvic Pain': ['sharp abdominal pain', 'lower abdominal pain', 'burning abdominal pain', 'upper abdominal pain', 'side pain', 'suprapubic pain', 'pelvic pain'],
-    'Muscle or Joint Stiffness': ['stiffness or tightness', 'stiff'], # catches arm stiffness, neck stiffness, etc.
-    'Muscle Cramps or Spasms': ['cramps or spasms', 'cramp', 'spasm'], # catches arm cramps, leg cramps, etc.
-    'Localized Weakness': ['weakness'], # catches knee weakness, arm weakness, but we exclude 'weakness' (general) if we want
+    'Muscle or Joint Stiffness': ['stiffness or tightness', 'stiff'],
+    'Muscle Cramps or Spasms': ['cramps or spasms', 'cramp', 'spasm'],
+    'Localized Weakness': ['weakness'],
     'Swelling or Lumps in Extremities': ['hand or finger swelling', 'wrist swelling', 'arm swelling', 'knee swelling', 'leg swelling', 'foot or toe swelling', 'ankle swelling', 'hip swelling', 'elbow swelling', 'knee lump or mass', 'leg lump or mass', 'arm lump or mass', 'wrist lump or mass', 'hip lump or mass', 'elbow lump or mass', 'foot or toe lump or mass', 'hand or finger lump or mass']
 }
 
 def clean_and_group_symptoms(df):
     print(f"Original Dataset shape: {df.shape}", flush=True)
     
-    # 1. Filter out unwanted diseases
     filtered_df = df[~df['diseases'].str.lower().str.contains('|'.join(DISEASE_BLOCKLIST_KEYWORDS))]
     print(f"Filtered out {len(df) - len(filtered_df)} rows of non-medical/rare diseases.", flush=True)
     print(f"Remaining diseases: {len(filtered_df['diseases'].unique())}", flush=True)
     
-    # 2. Middle Ground Feature Grouping
     new_df = pd.DataFrame()
     new_df['diseases'] = filtered_df['diseases']
     
     original_cols = [c for c in filtered_df.columns if c != 'diseases']
     mapped_original_cols = set()
     
-    # Apply merges
     for group_name, keywords in SYMPTOM_MERGES.items():
         new_df[group_name] = 0
         for col in original_cols:
             if any(kw in col.lower() for kw in keywords):
-                # Ensure we don't accidentally map general 'weakness' into Localized Weakness if we want it separate
                 if group_name == 'Localized Weakness' and col == 'weakness':
-                    continue # Keep general weakness separate
+                    continue
                 new_df[group_name] = new_df[group_name] | filtered_df[col]
                 mapped_original_cols.add(col)
                 
-    # Copy over all other highly specific symptoms exactly as they are
     for col in original_cols:
         if col not in mapped_original_cols:
             new_df[col] = filtered_df[col]

@@ -385,7 +385,6 @@ section, .hero, .section, .cta-section, footer {
     to   { opacity: 1; transform: translateX(0); }
 }
 
-/* ── Features Section ── */
 .section {
     padding: 4rem 5%;
     position: relative;
@@ -593,7 +592,6 @@ footer {
     color: var(--accent-gold);
 }
 
-/* ── Responsive ── */
 @media (max-width: 1024px) {
     .hero-right { flex: 0.85; }
     .animated-headline { font-size: 3.2rem; }

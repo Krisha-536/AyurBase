@@ -11,10 +11,9 @@ from config import SEVERE_DISEASES, MONGO_URI, SECRET_KEY
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
-# Setup MongoDB
 try:
     client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
-    client.server_info() # trigger exception if cannot connect
+    client.server_info()
     db = client.ayurbase
     users_collection = db.users
 except Exception as e:
@@ -22,7 +21,6 @@ except Exception as e:
     db = None
     users_collection = {}
 
-# Load ML Models and Data
 print("Loading Models...", flush=True)
 try:
     disease_model = joblib.load('disease_model.pkl')
@@ -32,7 +30,6 @@ try:
     remedy_model = joblib.load('remedy_dt_model.pkl')
     remedy_encoders = joblib.load('remedy_encoders.pkl')
     
-    # Load dataset for querying remedy details and doctors
     remedy_df = pd.read_csv('remedy.csv').fillna('Unknown')
     doctors_df = pd.read_csv('ayurvedic_doctors.csv')
     doctors_df['District Name'] = doctors_df['District Name'].ffill()
@@ -40,8 +37,6 @@ try:
 except Exception as e:
     print(f"Warning: Models not loaded. Please wait for train_models.py to finish. Error: {e}")
     disease_model = None
-
-# --- UI ROUTES ---
 
 @app.route('/')
 def index():
@@ -70,8 +65,6 @@ def results():
     if 'user_id' not in session:
         return redirect(url_for('auth'))
     return render_template('results.html')
-
-# --- API ROUTES ---
 
 @app.route('/api/auth/signup', methods=['POST'])
 def signup():
@@ -126,6 +119,26 @@ def logout():
     session.pop('user_id', None)
     return jsonify({"success": True})
 
+@app.route('/api/auth/save-dosha', methods=['POST'])
+def save_dosha():
+    if 'user_id' not in session or db is None:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    data = request.json
+    dosha = data.get('dosha')
+    
+    if not dosha:
+        return jsonify({"error": "Dosha not provided"}), 400
+    
+    try:
+        users_collection.update_one(
+            {"_id": ObjectId(session['user_id'])},
+            {"$set": {"dosha": dosha}}
+        )
+        return jsonify({"success": True, "message": "Dosha saved successfully"})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/user/profile', methods=['GET'])
 def get_profile():
     if 'user_id' not in session or db is None:
@@ -138,13 +151,11 @@ def get_profile():
     return jsonify({"error": "User not found"}), 404
 
 def get_age_gender_relevance(age, gender):
-    # Simplified mapping for demonstration based on the dataset
-    # The dataset has classes like 'All', 'Adults', 'Male-specific', 'Elderly'
     if age and int(age) > 60:
         return "Elderly"
     if age and int(age) > 18:
         if gender and gender.lower() == 'male':
-            return "Male-specific" # Note: actual dataset has 'All' or specific strings
+            return "Male-specific"
         return "Adults"
     return "All"
 
@@ -159,23 +170,19 @@ def predict():
     user = users_collection.find_one({"_id": ObjectId(session['user_id'])})
     
     data = request.json
-    selected_symptoms = data.get('symptoms', []) # list of strings
+    selected_symptoms = data.get('symptoms', [])
     
     if not selected_symptoms or len(selected_symptoms) < 2:
         return jsonify({"error": "Please provide at least 2 symptoms for an accurate prediction."}), 400
         
-    # 1. Disease Prediction
-    # Create one-hot array
     input_vector = np.zeros(len(symptoms_list))
     for i, s in enumerate(symptoms_list):
         if s in selected_symptoms:
             input_vector[i] = 1
             
-    # The MLPClassifier takes 2D array
     pred_idx = disease_model.predict([input_vector])[0]
     predicted_disease = disease_le.inverse_transform([pred_idx])[0]
     
-    # Check severity
     is_severe = False
     for severe in SEVERE_DISEASES:
         if severe.lower() in predicted_disease.lower():
@@ -183,11 +190,9 @@ def predict():
             break
             
     if is_severe:
-        # Fetch nearest doctor based on district
         district = user.get('district', '')
         nearby_doctors = []
         if district:
-            # Simple substring match
             docs = doctors_df[doctors_df['District Name'].str.contains(district, case=False, na=False)]
             for _, row in docs.iterrows():
                 if row.get('Name', 'Unknown') == 'Unknown':
@@ -202,16 +207,14 @@ def predict():
             "is_severe": True,
             "disease": predicted_disease,
             "message": f"Critical warning: {predicted_disease} is a severe condition. Please contact a doctor immediately. We cannot recommend home remedies for this condition.",
-            "doctors": nearby_doctors[:5] # limit to 5
+            "doctors": nearby_doctors[:5]
         })
         
-    # 2. Remedy Recommendation
     dosha = user.get('dosha', 'Unknown')
     age = user.get('age', 30)
     gender = user.get('gender', 'All')
     gender_age = get_age_gender_relevance(age, gender)
     
-    # 3. Robust Remedy Matching (Token Intersection + Dosha Fallback)
     import re
     disease_tokens = set(re.findall(r'\b\w+\b', predicted_disease.lower()))
     
@@ -228,7 +231,6 @@ def predict():
             best_matches.append(row)
             
     if best_score > 0:
-        # We found some disease overlap! Check if any match the user's dosha
         matched_df = pd.DataFrame(best_matches)
         dosha_matches = matched_df[matched_df['Dosha Type'].str.contains(dosha, case=False, na=False)]
         if len(dosha_matches) > 0:
@@ -238,7 +240,6 @@ def predict():
             remedy_row = matched_df.iloc[0]
             reasoning = f"This is the standard Ayurvedic recommendation for {predicted_disease}."
     else:
-        # Zero disease match fallback: Recommend based purely on Dosha!
         if dosha and dosha.lower() != 'unknown':
             dosha_matches = remedy_df[remedy_df['Dosha Type'].str.contains(dosha, case=False, na=False)]
             if len(dosha_matches) > 0:
