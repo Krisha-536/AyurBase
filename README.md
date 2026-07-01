@@ -1,12 +1,12 @@
 # AyurSense
 
-AyurBase is a full-stack web application that combines Ayurveda principles with machine learning to provide personalized health insights. The platform allows users to identify their dosha type, analyze symptoms, and receive either tailored Ayurvedic remedies or professional medical recommendations.
+AyurSense is a full-stack web application that combines Ayurveda principles with machine learning to provide personalized health insights. The platform allows users to identify their dosha type, analyze symptoms, and receive either tailored Ayurvedic remedies or professional medical recommendations.
 
 ---
 
 ## Overview
 
-AyurBase integrates a modern web interface with a Flask-based backend and a machine learning pipeline. It leverages a trained neural network model to predict diseases from user-reported symptoms and enhances results using dosha-based personalization.
+AyurSense integrates a modern web interface with a Flask-based backend and a machine learning pipeline. It leverages a trained neural network model to predict diseases from user-reported symptoms and enhances results using dosha-based personalization.
 
 ---
 
